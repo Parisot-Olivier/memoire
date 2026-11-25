@@ -1,206 +1,212 @@
-# memoire — un Git pour les idées
+# memoire — a Git for ideas
 
-**Français** · [English](README.en.md)
+[Français](README.md) · **English**
 
-**memoire** est un logiciel de bureau pour garder la mémoire d'un travail de conception : les échanges avec une IA, les notes, les décisions, leurs relations et leur lien avec le code. Il aide à retrouver *pourquoi* une chose a été conçue ainsi, et *où reprendre* le travail.
+> A local, Git-like memory for design work: it keeps your conversations with an AI, your notes and decisions and the relationships between them, ties them to your code with markers, and tells you what to re-examine when an idea changes. Rust core, SQLite storage, desktop GUI, and a command line that AI coding agents can drive.
 
-Tout reste **local** : une base SQLite par projet, sans compte ni service en ligne.
+**memoire** is a desktop application that keeps the memory of a design effort: conversations with an AI, notes, decisions, their relationships and their link to the code. It helps you find out *why* something was designed the way it was, and *where to resume* your work.
 
-## Ce que fait le logiciel
+Everything stays **local**: one SQLite database per project, no account, no online service.
 
-- **Conserver les échanges** avec une IA, octet pour octet, dans leur ordre : question et réponse d'origine.
-- **Citer et annoter** un passage précis, sans accumuler de commentaires à la suite.
-- **Relier les notes** : classé dans, dépend de, développé à partir de, justifie, restreint, contredit.
-- **Suivre l'état des idées** : vérifiée ou réfutée, proposée ou retenue, implémentée ou non. Rien n'est jamais supprimé : une idée « plus retenue » reste consultable.
-- **Signaler ce qu'il faut réexaminer** quand une note change ou est réfutée : ses dépendantes sont signalées, avec la cause.
-- **Ancrer une note dans le code** par un repère (`@design:`) et retrouver ce qui a bougé.
-- **Garder l'historique** comme dans Git : branches, annuler, rétablir, fusionner, restaurer un ancien état.
-- **Reprendre le travail** : un point de reprise enregistre l'objectif, la prochaine action et l'état du code.
+> **A note on language.** The software itself (interface, command line, command output) and the design documents are **in French**. This README gives the exact French commands and labels, with English translations in parentheses.
 
-## Prérequis
+## What it does
 
-| Outil | Version | Remarque |
+- **Keeps AI conversations** byte for byte, in order: the original question and answer.
+- **Quotes and annotates** a precise passage, without piling up comments.
+- **Links notes**: filed in, depends on, develops from, justifies, restricts, contradicts.
+- **Tracks the state of ideas**: verified or refuted, proposed or retained, implemented or not. Nothing is ever deleted: an idea that is "no longer retained" stays readable.
+- **Flags what needs re-examining** when a note changes or is refuted: its dependents are listed, together with the cause.
+- **Anchors a note in code** with a marker (`@design:`) and finds out what has moved.
+- **Keeps a history** like Git: branches, undo, redo, merge, restore an earlier state.
+- **Resumes work**: a resume point records the goal, the next action and the state of the code.
+
+## Requirements
+
+| Tool | Version | Note |
 |---|---|---|
-| `make` | — | seul point d'entrée |
-| Rust (`cargo`) | 1.91 ou plus | à installer avec [rustup](https://rustup.rs) |
-| Python 3 | récent | avec **Tkinter** pour l’interface |
+| `make` | — | the only entry point |
+| Rust (`cargo`) | 1.91 or later | install with [rustup](https://rustup.rs) |
+| Python 3 | recent | with **Tkinter** for the GUI |
 
-Tkinter s'installe avec le système : paquet `python3-tk` sous Debian et Ubuntu, `python3-tkinter` sous Fedora. La première construction télécharge les dépendances Rust (versions figées par `Cargo.lock`) ; il faut donc un accès réseau cette fois-là.
+Tkinter comes with your system: the `python3-tk` package on Debian and Ubuntu, `python3-tkinter` on Fedora. The first build downloads the Rust dependencies (versions pinned by `Cargo.lock`), so a network connection is needed that one time.
 
-## Lancer le programme
+## Running the program
 
 ```sh
 make
 ```
 
-Cette commande construit l'exécutable (mode release, versions figées) puis ouvre la fenêtre.
+This builds the executable (release mode, pinned versions) and opens the window.
 
-### Premier lancement
+### First launch
 
-1. Dans la fenêtre, ouvrez le sujet **Projet** et choisissez **Créer le projet**. Cela crée le fichier de base `.memoire/depot.db` dans le dossier d'où vous avez lancé `make`.
-2. Utilisez ensuite les sujets du menu à gauche : **Écrire**, **Relier**, **Juger**, **Lire**, **Code**, **Histoire et pistes**, **Où j'en suis**. Chaque action ouvre un formulaire et, pour les opérations sensibles, montre un aperçu avant d'écrire quoi que ce soit.
-3. Le **mode expert** offre un formulaire pour chaque commande de la ligne de commande.
+1. In the window, open the **Projet** (*Project*) topic and choose **Créer le projet** (*Create the project*). This creates the database file `.memoire/depot.db` in the folder from which you ran `make`.
+2. Then use the topics in the left-hand menu: **Écrire** (*Write*), **Relier** (*Link*), **Juger** (*Judge*), **Lire** (*Read*), **Code**, **Histoire et pistes** (*History and branches*), **Où j'en suis** (*Where I stand*). Each action opens a form and, for sensitive operations, shows a preview before writing anything.
+3. **Expert mode** offers one form for every command-line command.
 
-### Choisir ou changer la base
+### Choosing or changing the database
 
 ```sh
-make lancer BASE=/chemin/vers/mon-projet/.memoire/depot.db
+make lancer BASE=/path/to/my-project/.memoire/depot.db
 ```
 
-Dans l'interface, **Changer de projet…** permet aussi de passer d'une base à une autre. Un projet correspond à une base.
+In the GUI, **Changer de projet…** (*Change project…*) also lets you switch from one database to another. One project is one database.
 
-> Une base contient vos conversations : elle ne doit pas être publiée. Le dossier `.memoire/` est exclu par `.gitignore`.
+> A database contains your conversations: it must not be published. The `.memoire/` folder is excluded by `.gitignore`.
 
-## Autres cibles `make`
+## Other `make` targets
 
-| Commande | Effet |
+| Command | Effect |
 |---|---|
-| `make` ou `make lancer` | construit puis ouvre l'interface |
-| `make construire` | construit seulement l'exécutable `target/release/memoire` |
-| `make tests` | tests Rust et Python, sur des données de test fictives (voir « Données de test fictives »). L'interface est testée **sans afficher de fenêtre** si `xvfb-run` est installé (paquet `xorg-x11-server-Xvfb` sous Fedora, `xvfb` sous Debian et Ubuntu) ; `make tests VIRTUEL=0` force l'écran courant. Un test, celui de l'ordre des fenêtres, est ignoré faute de gestionnaire de fenêtres : `MEMOIRE=$PWD/target/release/memoire tools/essais-sous-kwin.sh` l'exécute avec KWin virtuel. |
-| `make verifier` | contrôle complet (formatage, dépendances, lints, tests, mutation) ; long, demande des outils supplémentaires (voir `tools/check.sh`) |
-| `make nettoyer` | supprime les produits de compilation |
-| `make aide` | liste les cibles |
+| `make` or `make lancer` | builds, then opens the GUI |
+| `make construire` | only builds the executable `target/release/memoire` |
+| `make tests` | Rust and Python tests, on fictional test data (see "Fictional test data"). The GUI is tested **without showing any window** if `xvfb-run` is installed (package `xorg-x11-server-Xvfb` on Fedora, `xvfb` on Debian and Ubuntu); `make tests VIRTUEL=0` forces the current display. One test, the window-stacking order test, is skipped for lack of a window manager: `MEMOIRE=$PWD/target/release/memoire tools/essais-sous-kwin.sh` runs it under a virtual KWin. |
+| `make verifier` | full check (formatting, dependencies, lints, tests, mutation testing); long, needs extra tools (see `tools/check.sh`) |
+| `make nettoyer` | removes build products |
+| `make aide` | lists the targets |
 
-## Utilisation avec une IA (expérimental)
+## Using it with an AI (experimental)
 
-**L'idée.** Une IA de programmation (un agent qui a accès à un terminal) construit dans memoire le **graphe de ce qu'elle va développer** : une note par intention, des liens « dépend de » entre elles, puis, une fois le code écrit, un **repère** qui rattache chaque morceau de code à sa note. L'humain relit ensuite le graphe pour **comprendre ce que l'IA a fait et pourquoi**, au lieu de relire tout le code.
+**The idea.** An AI coding agent (one with access to a terminal) builds in memoire the **graph of what it is about to develop**: one note per intention, "depends on" links between them and, once the code is written, a **marker** that ties each piece of code to its note. The human then reads the graph to **understand what the AI did and why**, instead of reading all the code.
 
-> **Guide complet pour l'IA : [`SKILLS/GUIDE-IA.md`](SKILLS/GUIDE-IA.md)** (français ; version anglaise : [`SKILLS/GUIDE-AI.md`](SKILLS/GUIDE-AI.md)). Voir la section « Le guide pour l'IA » ci-dessous.
+> **Complete guide for the AI: [`SKILLS/GUIDE-AI.md`](SKILLS/GUIDE-AI.md)** (English; the French original is [`SKILLS/GUIDE-IA.md`](SKILLS/GUIDE-IA.md)). See the section "The guide for the AI" below.
 >
-> **Statut.** Ce n'est pas une fonction intégrée : memoire n'appelle aucune IA et n'a ni serveur MCP ni plugin. Une IA l'utilise comme un humain, par la ligne de commande. Le flux ci-dessous a été **rejoué à la main** sur un petit exemple C ; il n'a pas encore été essayé avec un agent réel sur un vrai projet. Savoir si c'est un bon outil pour le « vibe coding » reste donc **à évaluer** (voir plus bas).
+> **Status.** This is not a built-in feature: memoire does not call any AI and has no MCP server or plugin. An AI uses it the way a human does, through the command line. The flow below was **replayed by hand** on a small C example; it has not yet been tried with a real agent on a real project. Whether it is a good tool for "vibe coding" therefore remains **to be evaluated** (see below).
 
-### Mise en place
+### Setup
 
 ```sh
-make construire                                    # produit target/release/memoire
-export MEMOIRE_BASE=/chemin/du/projet/.memoire/depot.db
-target/release/memoire init                        # crée la base du projet
-target/release/memoire aide                        # liste complète des commandes (utile à donner à l'IA)
+make construire                                    # produces target/release/memoire
+export MEMOIRE_BASE=/path/to/project/.memoire/depot.db
+target/release/memoire init                        # creates the project database
+target/release/memoire aide                        # full list of commands (useful to give to the AI)
 ```
 
-L'interface graphique (`make`) et l'IA travaillent sur la **même base** : l'humain voit le graphe se construire.
+The GUI (`make`) and the AI work on the **same database**: the human sees the graph being built.
 
-### Le flux, commande par commande
+### The flow, command by command
 
-| Étape | Commande | Résultat |
+| Step | Command | Result |
 |---|---|---|
-| 1. Poser l'intention | `memoire note creer --role raisonnement --titre "…" --texte "…" --oui` | une note, son identifiant est affiché |
-| 2. Décomposer | `memoire note creer --role implementation --titre "…" --depend-de ID --oui` | une note liée à la première |
-| 3. Rattacher au code | `memoire ancrer ID --fichier src/x.c --fonction "void f(int a)"` | affiche `Repère à copier : // @design: ID` |
-| 4. Poser le repère | **l'IA colle elle-même** la ligne `// @design: ID` au-dessus de la fonction | — |
-| 5. Relire | `memoire repere "// @design: ID"` | la note, ce dont elle dépend, ses réserves, ses ancrages |
-| 6. Détecter les écarts | `memoire indexer .` | repères retrouvés, **modifiés**, déplacés, perdus, inconnus |
-| 7. Du code à la note | `memoire code notes src/x.c --ligne 42` | les notes qui concernent cet endroit |
+| 1. State the intention | `memoire note creer --role raisonnement --titre "…" --texte "…" --oui` | a note; its identifier is printed |
+| 2. Break it down | `memoire note creer --role implementation --titre "…" --depend-de ID --oui` | a note linked to the first one |
+| 3. Tie it to the code | `memoire ancrer ID --fichier src/x.c --fonction "void f(int a)"` | prints `Repère à copier : // @design: ID` (*marker to copy*) |
+| 4. Place the marker | **the AI pastes** the line `// @design: ID` above the function itself | — |
+| 5. Read back | `memoire repere "// @design: ID"` | the note, what it depends on, its reservations, its anchors |
+| 6. Detect drift | `memoire indexer .` | markers found, **modified**, moved, lost, unknown |
+| 7. From code to note | `memoire code notes src/x.c --ligne 42` | the notes that concern this place |
 
-Points à connaître :
+Things to know:
 
-- **memoire n'écrit jamais dans votre code** (décision D9). À l'étape 4, c'est l'IA, avec ses propres outils d'édition, qui insère la ligne de repère. Le commentaire s'adapte au langage (`//`, `#`, `/* */`).
-- Lancez `indexer` **depuis la racine du projet** : les chemins des ancrages sont relatifs au dossier courant (lancé depuis `src/`, un ancrage apparaît à tort comme « déplacé »).
-- Une opération **critique** (qui crée une branche ou déclenche des réexamens) affiche d'abord un aperçu et ne s'applique qu'avec `--oui` (code de retour 4 sinon). Pour garder l'humain dans la boucle, **ne donnez pas `--oui` d'office** à l'IA pour ces opérations.
-- Tout est annulable (`annuler`, `retablir`) et rien n'est supprimé : une erreur de l'IA se corrige sans perte.
+- **memoire never writes into your code** (decision D9). In step 4, it is the AI, with its own editing tools, that inserts the marker line. The comment adapts to the language (`//`, `#`, `/* */`).
+- Run `indexer` **from the project root**: anchor paths are relative to the current folder (run from `src/`, an anchor wrongly shows up as "moved").
+- A **critical** operation (one that creates a branch or triggers re-examinations) first shows a preview and is only applied with `--oui` (return code 4 otherwise). To keep the human in the loop, **do not give the AI `--oui` by default** for these operations.
+- Everything can be undone (`annuler`, `retablir`) and nothing is deleted: an AI mistake can be corrected without loss.
 
-### Exemple d'instructions à donner à l'IA
+### Example instructions to give the AI
 
 ```text
-Tu travailles avec memoire (base : $MEMOIRE_BASE). Avant de coder une fonctionnalité :
-1. crée une note "raisonnement" qui dit ce que tu vas faire et pourquoi ;
-2. crée une note "implementation" par morceau de code prévu, avec --depend-de ;
-Après avoir écrit le code :
-3. pour chaque fonction, lance `memoire ancrer`, puis colle la ligne "// @design: ID" au-dessus ;
-4. lance `memoire indexer .` et corrige tout repère "modifié", "perdu" ou "inconnu".
-Si tu changes un raisonnement, utilise `memoire note reviser` en déclarant la nature
-(mineure ou substantielle) : les notes qui en dépendent passent à réexaminer.
-N'utilise --oui qu'après avoir montré l'aperçu à l'humain.
+You work with memoire (database: $MEMOIRE_BASE). Before coding a feature:
+1. create a "raisonnement" note saying what you are going to do and why;
+2. create one "implementation" note per planned piece of code, with --depend-de;
+After writing the code:
+3. for each function, run `memoire ancrer`, then paste the line "// @design: ID" above it;
+4. run `memoire indexer .` and fix every "modifié", "perdu" or "inconnu" marker.
+If you change a line of reasoning, use `memoire note reviser` and declare its nature
+(mineure or substantielle): the notes that depend on it become "to re-examine".
+Only use --oui after showing the preview to the human.
 ```
 
-### Est-ce un bon outil pour le vibe coding ?
+### Is it a good tool for vibe coding?
 
-Ce qui devrait aider (conçu pour, vérifié à la main) :
+What should help (designed for it, verified by hand):
 
-- **Comprendre après coup** : de n'importe quelle fonction, `repere` redonne l'intention et ses dépendances, sans relire la conversation.
-- **Voir la dérive** : `indexer` signale le code ancré qui a changé depuis la note, donc une note qui ne dit peut-être plus la vérité.
-- **Mesurer l'impact d'un changement** : réviser ou réfuter une note marque ses dépendantes « à réexaminer », avec la cause.
-- **Contrôle et réversibilité** : historique, annulation, branches pour essayer une piste de l'IA sans perdre l'autre.
+- **Understanding after the fact**: from any function, `repere` gives back the intention and its dependencies, without rereading the conversation.
+- **Seeing drift**: `indexer` flags anchored code that changed since the note was written, i.e. a note that may no longer tell the truth.
+- **Measuring the impact of a change**: revising or refuting a note marks its dependents "to re-examine", with the cause.
+- **Control and reversibility**: history, undo, branches to try one of the AI's ideas without losing the other.
 
-Limites connues :
+Known limits:
 
-- **memoire enregistre, il ne vérifie pas.** Une IA peut écrire une note fausse ou complaisante ; l'état « vérifiée » n'est posé que par un verdict explicite (`verdict`), jamais automatiquement.
-- **Le repère est posé à la main** par l'IA : si elle oublie, le code n'est pas rattaché. `indexer` le signale (« non ancrés »), mais ne le corrige pas.
-- **Un ancrage détecte le changement, il ne suit pas le code** : si l'IA réécrit la fonction, il faut ré-ancrer.
-- **Discipline requise** : le graphe n'est utile que si l'IA le tient à jour à chaque tâche, d'où les instructions ci-dessus.
-- **Aucune intégration** : pas de plugin d'éditeur ni de serveur MCP ; l'IA doit pouvoir lancer des commandes.
+- **memoire records, it does not verify.** An AI can write a wrong or complacent note; the "verified" state is only set by an explicit verdict (`verdict`), never automatically.
+- **The marker is placed by hand** by the AI: if it forgets, the code is not attached. `indexer` reports it ("non ancrés", *not anchored*) but does not fix it.
+- **An anchor detects change, it does not follow the code**: if the AI rewrites the function, it has to be anchored again.
+- **Discipline is required**: the graph is only useful if the AI keeps it up to date on every task, hence the instructions above.
+- **No integration**: no editor plugin, no MCP server; the AI must be able to run commands.
 
-Pour juger si l'outil mérite sa place dans votre pratique, essayez-le sur **une seule fonctionnalité** et regardez, une semaine plus tard : le graphe vous permet-il de retrouver pourquoi le code est écrit ainsi **sans relire la conversation** ? Les repères sont-ils tous encore « retrouvés » ? Le temps passé à tenir le graphe est-il inférieur à celui gagné à relire ?
+To judge whether the tool deserves a place in your workflow, try it on **a single feature** and look a week later: does the graph let you find out why the code is written that way **without rereading the conversation**? Are all the markers still "found"? Is the time spent maintaining the graph less than the time saved rereading?
 
-## Le guide pour l'IA : `SKILLS/GUIDE-IA.md`
+## The guide for the AI: `SKILLS/GUIDE-AI.md`
 
-Le dossier `SKILLS/` contient **`GUIDE-IA.md`** (français) et sa traduction anglaise **`GUIDE-AI.md`** : un mode d'emploi de memoire écrit **pour une IA de programmation** (un agent qui a accès à un terminal). Il lui permet de :
+The `SKILLS/` folder contains the user manual of memoire written **for an AI coding agent** (one with access to a terminal), in two languages: **`GUIDE-AI.md`** (English) and **`GUIDE-IA.md`** (French original). It lets the AI:
 
-- **utiliser memoire seule**, sans explication de votre part : installer la base, créer des notes et des liens, changer leur statut, annuler, sauvegarder ;
-- **construire le graphe de ce qu'elle développe** : une note par intention, des dépendances entre elles, puis rattacher chaque fonction à sa note par un repère `// @design: ID` ;
-- **contrôler la cohérence** entre les notes et le code (`indexer`) et signaler ce qui est à revoir ;
-- **respecter les garde-fous** : ne pas confirmer une opération critique sans votre accord, ne pas toucher à la base autrement que par `memoire`, ne pas affirmer qu'une idée est vérifiée sans preuve ;
-- **reprendre une session interrompue** grâce aux points de reprise.
+- **use memoire on its own**, without explanations from you: set up the database, create notes and links, change their status, undo, back up;
+- **build the graph of what it develops**: one note per intention, dependencies between them, then attach each function to its note with a `// @design: ID` marker;
+- **check consistency** between the notes and the code (`indexer`) and report what needs a second look;
+- **respect the safeguards**: not confirm a critical operation without your approval, not touch the database other than through `memoire`, not claim an idea is verified without evidence;
+- **resume an interrupted session** thanks to resume points.
 
-Il contient aussi un déroulé de session type, les codes de retour, les pièges connus et un **bloc prêt à coller** dans le `CLAUDE.md` ou l'`AGENTS.md` de votre projet. Pour l'utiliser, donnez le fichier à votre IA (ou placez-le là où votre outil charge ses « skills » ou instructions), puis demandez-lui de s'en servir pour votre projet.
+It also contains a typical session walk-through, the return codes, known pitfalls, and a **ready-to-paste block** for your project's `CLAUDE.md` or `AGENTS.md`. To use it, give the file to your AI (or place it wherever your tool loads its "skills" or instructions), then ask it to use it for your project.
 
-## Faire évoluer le logiciel : les documents à la racine
+## Evolving the software: the documents at the root
 
-Les autres fichiers `.md` à la racine du dépôt (`REPRISE.md`, `DECISIONS.md`, `INVARIANTS.md`, `CAHIER_DES_CHARGES.md`, `CLI.md`, `INTERFACE.md`, `FORMAT.md`, etc.) ne servent **pas à utiliser** memoire. Ce sont les documents de conception du logiciel : ils sont là **pour qui veut le modifier ou le faire évoluer**. Ils expliquent ce qui a été décidé, pourquoi, quelles règles le code doit respecter et comment l'architecture est organisée (domaine, stockage, service, ligne de commande, interface).
+The other `.md` files at the root of the repository (`REPRISE.md`, `DECISIONS.md`, `INVARIANTS.md`, `CAHIER_DES_CHARGES.md`, `CLI.md`, `INTERFACE.md`, `FORMAT.md`, etc.) are **not for using** memoire. They are the design documents of the software: they are there **for anyone who wants to modify it or make it evolve**. They explain what was decided and why, which rules the code must follow, and how the architecture is organised (domain, storage, service, command line, interface).
 
-**Reprendre le développement avec votre propre IA.** Ces documents sont écrits pour qu'un développeur, humain ou IA, reprenne le projet sans l'historique des échanges qui l'ont construit. La démarche conseillée :
+**Resuming development with your own AI.** These documents are written so that a developer, human or AI, can take over the project without the history of the conversations that built it. The recommended approach:
 
-1. Demandez à votre IA de lire d'abord **`REPRISE.md`** (état du projet, documents de référence, architecture, règles de travail, limites connues), puis `DECISIONS.md` et `INVARIANTS.md`.
-2. Faites-lui **faire sa propre reprise** : qu'elle résume ce qu'elle a compris de l'architecture et des règles, et qu'elle vous le restitue avant de toucher au code.
-3. Faites-la travailler selon les règles du projet (`REPRISE.md`, section 5) : **conception avant code**, puis **contrat avant code** (les tests d'abord).
-4. Une fois à l'aise, vous pouvez utiliser memoire pour suivre le développement de memoire lui-même, avec `SKILLS/GUIDE-IA.md`.
+1. Ask your AI to read **`REPRISE.md`** first (project state, reference documents, architecture, working rules, known limits), then `DECISIONS.md` and `INVARIANTS.md`.
+2. Have it **do its own takeover**: it should summarise what it understood of the architecture and the rules, and report it back to you before touching any code.
+3. Make it work according to the project's rules (`REPRISE.md`, section 5): **design before code**, then **contract before code** (tests first).
+4. Once you are comfortable, you can use memoire to follow the development of memoire itself, with `SKILLS/GUIDE-AI.md`.
 
-À savoir avant de commencer :
+Before you start:
 
-- **Les documents sont en français** et décrivent l'état du projet à la date de leur rédaction.
-- **`REPRISE.md` mentionne des branches et des étiquettes Git** (`inc-8.5`, `v0.8.0-alpha.2`…) qui appartiennent à l'historique privé de l'auteur : elles ne sont **pas** dans ce dépôt.
-- **Les tests passent** (Rust et Python) sur des données de test **fictives** (voir « Données de test fictives »). Lancez `make tests` avant toute modification : c'est votre filet de sécurité.
+- **The documents are in French** and describe the state of the project at the time they were written. An AI can read them as they are; ask it to answer in English if you prefer.
+- **`REPRISE.md` mentions Git branches and tags** (`inc-8.5`, `v0.8.0-alpha.2`…) that belong to the author's private history: they are **not** in this repository.
+- **The tests pass** (Rust and Python) on **fictional** test data (see "Fictional test data"). Run `make tests` before any change: it is your safety net.
 
-## Organisation du dépôt
+## Repository layout
 
-| Dossier | Rôle |
+| Folder | Role |
 |---|---|
-| `crates/memoire-domain` | règles métier, sans entrée-sortie ni dépendance |
-| `crates/memoire-store` | stockage SQLite |
-| `crates/memoire-app` | couche service |
-| `crates/memoire-cli` | exécutable `memoire` (ligne de commande) |
-| `gui/` | interface graphique Tkinter, qui pilote l'exécutable |
-| `fixtures/` | données de référence des tests, **fictives** et figées (voir ci-dessous) |
-| `tools/` | scripts de contrôle |
-| `SKILLS/` | guide d'utilisation de memoire pour une IA (`GUIDE-IA.md` en français, `GUIDE-AI.md` en anglais) |
-| `*.md` à la racine | documents de conception, pour faire évoluer le logiciel |
+| `crates/memoire-domain` | business rules, no I/O and no dependency |
+| `crates/memoire-store` | SQLite storage |
+| `crates/memoire-app` | service layer |
+| `crates/memoire-cli` | the `memoire` executable (command line) |
+| `gui/` | Tkinter graphical interface, which drives the executable |
+| `fixtures/` | reference data for the tests, **fictional** and frozen (see below) |
+| `tools/` | check scripts |
+| `SKILLS/` | guide to using memoire for an AI (`GUIDE-AI.md` in English, `GUIDE-IA.md` in French) |
+| `*.md` at the root | design documents, for evolving the software |
 
-## Données de test fictives
+## Fictional test data
 
-Le dossier `fixtures/` contient les données de référence des tests, figées octet pour octet (empreintes SHA-256 dans les `SHA256SUMS`). Les données d'origine de l'auteur, qui étaient personnelles, ont été **remplacées par des données fictives** :
+The `fixtures/` folder holds the reference data of the tests, frozen byte for byte (SHA-256 digests in the `SHA256SUMS` files). The author's original data, which was personal, has been **replaced with fictional data**:
 
-| Dossier | Contenu |
+| Folder | Content |
 |---|---|
-| `fixtures/rtos-2026-10/` | une conversation fictive avec une IA (`doc.md`, 5 échanges sur le réveil de tâches par un driver GPIO) et le code C correspondant (`driver.c`) : le jeu d'entrée du scénario de référence S-REF-01 |
-| `fixtures/format/` | les exemples du format d'export (v1 et v2), **régénérés par le code** : ils sont identiques octet pour octet aux originaux |
-| `fixtures/schema1/` | une base SQLite de l'ancien schéma 1 et son export, produits en rejouant le scénario S-REF-01 sur la conversation fictive (47 commits, 2 branches) ; ils servent à tester la migration |
+| `fixtures/rtos-2026-10/` | a fictional conversation with an AI (`doc.md`, 5 exchanges about waking tasks from a GPIO driver) and the matching C code (`driver.c`): the input of the reference scenario S-REF-01 |
+| `fixtures/format/` | the export-format examples (v1 and v2), **regenerated by the code**: they are byte-for-byte identical to the originals |
+| `fixtures/schema1/` | an SQLite database in the old schema 1 and its export, produced by replaying scenario S-REF-01 on the fictional conversation (47 commits, 2 branches); they are used to test the migration |
 
-Les contraintes que les tests imposent à ces données sont respectées à l'identique : tailles exactes (`doc.md` 20 392 octets, `driver.c` 4 263 octets), nombre de tabulations, d'espaces insécables et de séquences spéciales, passages cités présents une seule fois.
+The constraints the tests place on this data are met exactly: exact sizes (`doc.md` 20,392 bytes, `driver.c` 4,263 bytes), number of tabs, non-breaking spaces and special sequences, and each quoted passage appearing exactly once.
 
-**Un seul changement de contrat** a été nécessaire, dans `crates/memoire-store/tests/stockage.rs` : les tailles de la base de schéma 1 et de son export, qui dépendent du contenu de la conversation (1 380 352 et 88 658 octets avec les données d'origine, 1 392 640 et 88 530 octets avec les données fictives). Toutes les autres assertions sont inchangées.
+**A single contract change** was needed, in `crates/memoire-store/tests/stockage.rs`: the sizes of the schema-1 database and of its export, which depend on the content of the conversation (1,380,352 and 88,658 bytes with the original data, 1,392,640 and 88,530 bytes with the fictional data). All other assertions are unchanged.
 
-Si vous remplacez ces données par les vôtres, recalculez les `SHA256SUMS` et ajustez ces deux tailles.
+If you replace this data with your own, recompute the `SHA256SUMS` and adjust those two sizes.
 
-## Pour aller plus loin
+## Further reading
 
-| Document | Contenu |
+All of these documents are in French.
+
+| Document | Content |
 |---|---|
-| `CAHIER_DES_CHARGES.md` | besoins et fonctionnement attendu |
-| `INTERFACE.md`, `ACTIONS.md` | l'interface et son catalogue d'actions |
-| `SKILLS/GUIDE-IA.md`, `SKILLS/GUIDE-AI.md` | guide d'utilisation de memoire destiné à une IA (français, anglais) |
-| `CLI.md` | la ligne de commande |
-| `DECISIONS.md` | décisions de conception, une fiche par décision |
-| `INVARIANTS.md`, `TRACABILITE.md` | règles vérifiées par les tests |
-| `FORMAT.md`, `STOCKAGE.md` | format d'export et stockage |
-| `REPRISE.md` | état d'avancement du projet |
+| `CAHIER_DES_CHARGES.md` | requirements and expected behaviour |
+| `INTERFACE.md`, `ACTIONS.md` | the GUI and its action catalogue |
+| `SKILLS/GUIDE-AI.md` | guide to using memoire, aimed at an AI (English) |
+| `CLI.md` | the command line |
+| `DECISIONS.md` | design decisions, one sheet per decision |
+| `INVARIANTS.md`, `TRACABILITE.md` | rules checked by the tests |
+| `FORMAT.md`, `STOCKAGE.md` | export format and storage |
+| `REPRISE.md` | project progress and handover notes |
