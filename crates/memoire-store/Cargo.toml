@@ -1,0 +1,16 @@
+[package]
+name = "memoire-store"
+version = "0.1.0"
+description = "Stockage SQLite d'un dépôt memoire-domain (D4, D14) : transaction par commande, rechargement par le format canonique."
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+memoire-domain = { path = "../memoire-domain" }
+# D14 : version figée par Cargo.lock, publiée depuis plus de deux semaines ; SQLite intégré.
+rusqlite = { version = "=0.41.0", features = ["bundled"] }
+
+[lints]
+workspace = true

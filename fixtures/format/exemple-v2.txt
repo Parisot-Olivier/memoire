@@ -1,0 +1,17 @@
+memoire-instantane 2
+contenu a5000000-0000-0000-0000-000000000001 echange titre "conversation" texte ""
+echange a5000000-0000-0000-0000-000000000001 question - reponse "Élément\tRôle\nfin \"cité\" \\ 🚀⁠￼" precedent -
+contenu a5000000-0000-0000-0000-000000000002 citation titre "" texte "Élément"
+citation a5000000-0000-0000-0000-000000000002 source a5000000-0000-0000-0000-000000000001 partie reponse version - debut 0 fin 9 empreinte 0f661db2d23f65f3
+contenu a5000000-0000-0000-0000-000000000003 reserve titre "réserve" texte ""
+reserve a5000000-0000-0000-0000-000000000003 passage a5000000-0000-0000-0000-000000000002 cible "startup.s (à créer)"
+contenu a5000000-0000-0000-0000-000000000004 implementation titre "N" texte "v0"
+revision a5000000-0000-0000-0000-000000000004 1 mineure titre "N" texte "v1"
+ancrage a5000000-0000-0000-0000-000000000006 note a5000000-0000-0000-0000-000000000004 etat actif chemin "src/driver.c" extrait "void refresh() {}" empreinte 3f38db1c879fb6fd git -
+contexte 00000000-0000-0000-0000-000000000000
+membre 00000000-0000-0000-0000-000000000000 a5000000-0000-0000-0000-000000000001 verdict - decision - implementation - reserve - visibilite courante
+membre 00000000-0000-0000-0000-000000000000 a5000000-0000-0000-0000-000000000002 verdict non-verifiee decision proposee implementation - reserve - visibilite courante
+membre 00000000-0000-0000-0000-000000000000 a5000000-0000-0000-0000-000000000003 verdict - decision - implementation - reserve ouverte visibilite courante
+membre 00000000-0000-0000-0000-000000000000 a5000000-0000-0000-0000-000000000004 verdict non-verifiee decision retenue implementation non-commencee reserve - visibilite courante
+relation 00000000-0000-0000-0000-000000000000 a5000000-0000-0000-0000-000000000005 a5000000-0000-0000-0000-000000000004 a5000000-0000-0000-0000-000000000002 depend-de etat active empreinte 0 0 annotation - anterieur -
+fin

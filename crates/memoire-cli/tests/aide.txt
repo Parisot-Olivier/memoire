@@ -1,0 +1,51 @@
+Usage : memoire [--base FICHIER] COMMANDE …
+Base : --base, sinon MEMOIRE_BASE, sinon .memoire/depot.db
+Commandes :
+  init — crée la base (jamais d'écrasement)
+  statut — branche active, ressources actuelles, notes à réexaminer et leurs causes
+  chercher TEXTE — notes dont le nom contient TEXTE, sans tenir compte de la casse ni des accents
+  note creer --role categorie|raisonnement|implementation|note --titre T [--texte X] [--classe-dans NOTES] [--depend-de NOTES] [--developpe-a-partir-de NOTES] [--lien NOTES] [--motif M] [--oui] — crée une note et affiche son identifiant ; avec des liens (NOTES : notes séparées par des virgules), la crée et la relie en une seule opération
+  note reviser NOTE --texte X --nature mineure|substantielle [--motif M] [--oui] — révise le texte d'une note ; la nature est déclarée, jamais implicite (D5)
+  echange coller --titre T --reponse-fichier R [--question-fichier Q] [--precedent ECHANGE] — enregistre un échange octet pour octet ; sans question, il reste incomplet
+  echange question ECHANGE --fichier Q — complète la question d'un échange incomplet
+  citer NOTE (--texte X | --plage A-B) [--partie question|reponse] [--version N] [--occurrence N] [--soutient NOTES] [--inspire NOTES] [--classe-dans NOTES] [--lien NOTES] [--note TITRE] [--role categorie|raisonnement|implementation|note] [--texte-note X] [--reserve TITRE] [--cible C] [--motif M] [--oui] — cite le texte exact X, ou la plage A-B en octets, d'un échange (sa réponse par défaut) ou d'une note (sa version courante par défaut), et relie la citation à sa source ; avec des liens, une note ou une réserve, relie la citation et crée ces objets en une seule opération
+  source NOTE [--partie question|reponse] [--version N] — affiche le texte exact d'une partie d'un échange ou d'une version d'une note, octet pour octet
+  citations NOTE [--partie question|reponse] [--version N] — liste les citations de cette source : identifiant, début et fin en octets, statut
+  voisinage NOTE [--tsv] — relations actives de la note, groupées par origine : note entière, citation, catégorie ; --tsv : une ligne par lien, pour l'interface
+  lier ORIGINE TYPE DESTINATION [--motif M] [--oui] — relie deux notes ; TYPE : classe-dans, depend-de, developpe-a-partir-de, lien
+  restreindre ORIGINE DESTINATION --condition C [--motif M] [--oui] — limite l'applicabilité de la destination à une condition, sans verdict
+  contredire ORIGINE DESTINATION --justification J [--motif M] [--oui] — enregistre un désaccord assumé, sans effet sur la destination
+  verdict NOTE non-verifiee|verifiee|refutee --motif M [--oui] — pose l'état de vérification d'une note
+  decision NOTE proposee|retenue|plus-retenue|remplacee --motif M [--oui] — pose l'état de décision d'une note
+  implementation NOTE non-commencee|en-cours|implementee --motif M [--oui] — pose l'état d'implémentation d'une note
+  acquitter DEPENDANT CAUSE --motif M [--oui] — confirme qu'une note reste pertinente malgré une cause de réexamen
+  retirer NOTE [--motif M] [--oui] — retire une note ou un échange des ressources actuelles ; ses dépendants passent à réexaminer
+  reserve creer PASSAGE --titre T [--cible C] — crée une réserve depuis un passage
+  reserve concerne RESERVE NOTE [--motif M] [--oui] — indique que la réserve s'applique à la note ; elle reste ouverte
+  reserve traiter NOTE RESERVE --motif M [--oui] — la note traite la réserve, qui passe à « traitée à vérifier »
+  reserve etat RESERVE ouverte|traitee-a-verifier|resolue --motif M [--oui] — pose l'état d'une réserve
+  ancrer NOTE --fichier F (--fonction SIGNATURE | --lignes A-B) [--git COMMIT] — ancre une note dans le code et affiche le repère à copier ; le fichier n'est pas modifié
+  repere LIGNE — depuis une ligne de code contenant un repère : note, décision, sources, réserves, ancrages
+  indexer DOSSIER [--extensions LISTE] — parcourt le code de DOSSIER et rend l'état des repères et des ancrages : retrouvés, modifiés, déplacés, ambigus, perdus, inconnus, non ancrés ; n'écrit rien
+  code notes FICHIER [--ligne N] [--extrait TEXTE] [--tsv] — notes liées à ce fichier de code et marques qu'il contient ; avec une ligne ou un extrait, celles qui les concernent d'abord ; n'écrit rien
+  annuler [--motif M] — annule la dernière opération de la branche active
+  retablir [--motif M] — rétablit la dernière opération annulée
+  historique [--nombre N] — liste les derniers commits de la branche active, du plus récent au plus ancien : identifiant, commande, motif
+  restauration plan --depuis COMMIT [--notes NOTES] — ce que rétablira la restauration de ces notes (ou de tout le réseau) depuis ce commit, et les relations avec le reste du réseau conservées
+  restaurer --depuis COMMIT [--notes NOTES] [--motif M] [--oui] — rétablit ces notes, avec leurs liens internes, dans leur état de ce commit, sans toucher le reste ; sans --notes, tout le réseau
+  reprise noter --objectif TEXTE --action TEXTE [--question TEXTE] [--etat TEXTE] [--resultat TEXTE] [--hypothese TEXTE] [--ouverts TEXTE] [--notes NOTES] [--code DOSSIER] [--sans-code] [--motif M] — enregistre un point de reprise : objectif, prochaine action, et l'état du code lu dans Git sans rien y écrire ; le réseau ne change pas
+  reprise voir [--depuis COMMIT] [--code DOSSIER] — affiche le dernier point de reprise de la branche active (ou celui de ce commit) et ce qui a changé depuis, réseau et code
+  reprise liste [--toutes] [--nombre N] — liste les points de reprise de la branche active, du plus récent au plus ancien ; --toutes : de chaque branche active
+  reprise code COMMIT — écrit le travail non enregistré noté avec ce point de reprise, sous forme de patch à réappliquer par git apply
+  branches [--toutes] [--tsv] — liste les branches ; * marque la branche active ; --toutes montre aussi les branches abandonnées ; --tsv : une ligne par branche avec un nom lisible, pour l'interface
+  basculer BRANCHE [--motif M] — change de branche active (identifiant ou préfixe d'au moins 8 caractères)
+  abandonner BRANCHE [--motif M] — abandonne une branche sans rien supprimer ; si elle est active, revient sur son origine
+  reactiver BRANCHE [--motif M] — réactive une branche abandonnée, sans la rendre active
+  fusion plan SOURCE [--tsv] — plan de la fusion de SOURCE dans la branche active : base, conflits numérotés, conflit structurel, effets, code du plan ; --tsv : une donnée par ligne, pour l'interface
+  fusionner SOURCE --plan CODE [--cible NUMEROS] [--source NUMEROS] [--desactiver NUMEROS] [--motif M] [--oui] — fusionne SOURCE selon son plan (NUMEROS : numéros séparés par des virgules), après une sauvegarde dans sauvegardes/
+  exporter FICHIER — écrit le texte canonique du dépôt complet, de façon atomique
+  importer FICHIER — crée la base à partir d'un export, validé en entier avant toute création
+  sauvegarder [FICHIER] — copie cohérente de la base ; par défaut, horodatée dans sauvegardes/ à côté de la base
+  verifier — relit tout l'historique et confirme l'état courant de chaque branche
+  migrer — convertit une base de schéma 1 au schéma 2, après une sauvegarde dans sauvegardes/, et la vérifie en entier
+  aide [COMMANDE] — liste les commandes, ou détaille l'une d'elles

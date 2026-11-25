@@ -1,0 +1,22 @@
+[package]
+name = "memoire-app"
+version = "0.1.0"
+description = "Couche service (SERVICE.md) : identités UUID, enveloppes, préparation puis application, répétition sûre."
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+memoire-domain = { path = "../memoire-domain" }
+memoire-store = { path = "../memoire-store" }
+# D14 : version figée, publiée le 2026-09-10 ; seule la génération version 4 est employée.
+uuid = { version = "=1.26.1", features = ["v4"] }
+
+[dev-dependencies]
+# Tests de la migration (5.2d) : base gardée ouverte par un autre processus. Même version que le
+# stockage.
+rusqlite = { version = "=0.41.0", features = ["bundled"] }
+
+[lints]
+workspace = true

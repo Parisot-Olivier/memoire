@@ -1,0 +1,25 @@
+[package]
+name = "memoire-cli"
+version = "0.1.0"
+description = "Ligne de commande (CLI.md) : première interface, sur la couche service."
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[[bin]]
+name = "memoire"
+path = "src/main.rs"
+
+[dependencies]
+memoire-domain = { path = "../memoire-domain" }
+memoire-store = { path = "../memoire-store" }
+memoire-app = { path = "../memoire-app" }
+
+# Pour les tests seulement : altérer une base hors du logiciel. Même version que memoire-store,
+# déjà figée par Cargo.lock (D14).
+[dev-dependencies]
+rusqlite = { version = "=0.41.0", features = ["bundled"] }
+
+[lints]
+workspace = true

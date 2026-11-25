@@ -1,0 +1,15 @@
+[package]
+name = "memoire-domain"
+version = "0.2.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Domaine du logiciel de mémoire de conception : modèle, commandes et transitions, sans entrée-sortie"
+
+# Aucune dépendance : contrainte d'architecture. Le domaine reste déterministe
+# et sans exposition aux fournisseurs de bibliothèques (phase 2, choix validé).
+[dependencies]
+
+[lints]
+workspace = true

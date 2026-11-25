@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.91"
+license = "UNLICENSED"
+
+# Garde-fous communs à toutes les crates et à leurs tests.
+# Les interdictions unwrap/expect/panic du seul code livré sont posées dans chaque lib.rs.
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
