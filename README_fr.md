@@ -1,6 +1,8 @@
 # memoire — un Git pour les idées
 
-**Français** · [English](README.en.md)
+**Français** · [English](README.md)
+
+Ce logiciel a été entièrement développé avec Claude Opus 5.5 et Claude Fable 5.2, à partir d'un cahier des charges défini par mes soins avec l'aide de ChatGPT 6.1 Astra, qui a également fourni les tests de base de l'architecture. Le design a été entièrement réalisé par moi-même, avec quelques adaptations apportées par Claude Fable 5.2.
 
 **memoire** est un logiciel de bureau pour garder la mémoire d'un travail de conception : les échanges avec une IA, les notes, les décisions, leurs relations et leur lien avec le code. Il aide à retrouver *pourquoi* une chose a été conçue ainsi, et *où reprendre* le travail.
 
