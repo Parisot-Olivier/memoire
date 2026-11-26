@@ -1,6 +1,8 @@
 # memoire — a Git for ideas
 
-[Français](README.md) · **English**
+[Français](README_fr.md) · **English**
+
+This software was entirely developed using Claude Opus 5.5 and Claude Fable 5.2, based on a specification document I defined with the assistance of ChatGPT 6.1 Astra, which also provided the initial architectural tests. The entire software design was created by me, with a few adjustments implemented by Claude Fable 5.2.
 
 > A local, Git-like memory for design work: it keeps your conversations with an AI, your notes and decisions and the relationships between them, ties them to your code with markers, and tells you what to re-examine when an idea changes. Rust core, SQLite storage, desktop GUI, and a command line that AI coding agents can drive.
 
